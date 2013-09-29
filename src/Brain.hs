@@ -1,4 +1,8 @@
-module Brain where
+module Brain (
+  Brain
+, memorizeNicks
+, recallNicks
+) where
 
 import           Control.Applicative
 import           Data.Monoid
