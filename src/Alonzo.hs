@@ -1,27 +1,30 @@
 module Alonzo where
 
 import           Control.Monad (forever)
+import           Control.Monad.State (StateT, evalStateT, lift)
 import           Network.IRC
 
 import           Logging
 import           IRC
 
-type Trait = Message -> IRC ()
+type Trait a = Message -> Alonzo a ()
 
-alonzo :: UserName -> [Trait] -> Config -> IO ()
-alonzo name traits c = run c $ do
+type Alonzo a = StateT a IRC
+
+alonzo :: UserName -> a -> [Trait a] -> Config -> IO ()
+alonzo name brain traits c = run c $ (`evalStateT` brain) $ do
   sendMessage (nick name)
-  send ("USER " ++ name ++ " 0 * :Alonzo - Your friendly IRC bot!")
+  lift . send $ "USER " ++ name ++ " 0 * :Alonzo - Your friendly IRC bot!"
   forever $ do
     m <- receiveMessage
     sequence_ $ map ($ m) traits
 
-sendMessage :: Message -> IRC ()
-sendMessage = send . encode
+sendMessage :: Message -> Alonzo a ()
+sendMessage = lift . send . encode
 
-receiveMessage :: IRC Message
+receiveMessage :: Alonzo a Message
 receiveMessage = do
-  s <- receive
+  s <- lift receive
   case decode s of
     Nothing -> logError ("Parsing of " ++ show s ++ " failed!") >> receiveMessage
     Just Message {msg_command = "PING", msg_params = servers} -> sendMessage (pong servers) >> receiveMessage
