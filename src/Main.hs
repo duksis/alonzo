@@ -5,7 +5,6 @@ import           Data.Char
 import           Control.Monad (when)
 import           Control.Concurrent (threadDelay)
 import           Control.Monad.State (liftIO)
-import           Data.Default
 import           System.Random
 
 import           Util
@@ -16,7 +15,18 @@ import qualified Command
 import qualified Match
 
 main :: IO ()
-main = readConfig >>= alonzo "alonzo" def [memorizeNicks, mentionAll, opMe, socialize, complainAboutPerfect]
+main = readConfig >>= alonzo nick brain traits
+  where
+    nick = "alonzo"
+    brain = emptyBrain "alonzo"
+    traits = [
+        memorizeMyNick
+      , memorizeNicks
+      , mentionAll
+      , opMe
+      , socialize
+      , complainAboutPerfect
+      ]
 
 -- | Take a break for 200 to 500 milliseconds and think about it.
 thinkAboutIt :: Alonzo a ()

@@ -1,10 +1,14 @@
 module Brain (
   Brain
+, emptyBrain
+, memorizeMyNick
+, recallMyNick
 , memorizeNicks
 , recallNicks
 ) where
 
 import           Control.Applicative
+import           Control.Monad (when)
 import           Data.Monoid
 import           Data.Map (Map)
 import qualified Data.Map as Map
@@ -15,14 +19,25 @@ import           Network.IRC
 import           Control.Monad.State (gets, modify)
 
 import           Alonzo
+import qualified Match
 
 -- | A simple non-persistent brain.
 data Brain = Brain {
   nicks :: Map Channel (Set UserName)
+, myNick :: UserName
 } deriving (Eq, Show)
 
-instance Default Brain where
-  def = Brain def
+emptyBrain :: UserName -> Brain
+emptyBrain = Brain def
+
+recallMyNick :: Alonzo Brain UserName
+recallMyNick = gets myNick
+
+memorizeMyNick :: Trait Brain
+memorizeMyNick = Match.nick $ \old new -> do
+  mine <- gets myNick
+  when (old == mine) $ do
+    modify $ \b -> b{myNick = new}
 
 recallNicks :: Channel -> Alonzo Brain [UserName]
 recallNicks c = maybe [] Set.elems . Map.lookup c <$> gets nicks

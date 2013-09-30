@@ -16,3 +16,8 @@ message :: Monad m => (Channel -> String -> m ()) -> Message -> m ()
 message f m = case m of
   Message {msg_command = "PRIVMSG", msg_params = [chan@('#':_), msg]} -> f chan msg
   _ -> return ()
+
+nick :: Monad m => (UserName -> UserName -> m ()) -> Message -> m ()
+nick f m = case m of
+  Message {msg_prefix = Just (NickName old _ _), msg_command = "NICK", msg_params = [new]} -> f old new
+  _ -> return ()
