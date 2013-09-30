@@ -1,21 +1,26 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main (main) where
 
+import           Data.Char
 import           Control.Monad (when)
-import           Data.List
+import           Control.Concurrent (threadDelay)
+import           Control.Monad.State (liftIO)
 import           Data.Default
+import           System.Random
 
+import           Util
 import           Config
 import           Alonzo
 import           Brain
 import qualified Command
 import qualified Match
 
-contains :: String -> String -> Bool
-contains = flip isInfixOf
-
 main :: IO ()
-main = readConfig >>= alonzo "alonzo" def [memorizeNicks, mentionAll, opMe, socialize]
+main = readConfig >>= alonzo "alonzo" def [memorizeNicks, mentionAll, opMe, socialize, complainAboutPerfect]
+
+-- | Take a break for 200 to 500 milliseconds and think about it.
+thinkAboutIt :: Alonzo a ()
+thinkAboutIt = liftIO $ randomRIO (200000, 500000) >>= threadDelay
 
 -- | Makes Alonzo mention all nicks in channel if a message contains @all.
 mentionAll :: Trait Brain
@@ -23,6 +28,19 @@ mentionAll = Match.message $ \chan msg -> do
   when (msg `contains` "@all") $ do
     nicks <- recallNicks chan
     Command.privmsg chan ("^ " ++ unwords nicks)
+
+-- | Makes Alonzo complain on "perfect".
+complainAboutPerfect :: Trait Brain
+complainAboutPerfect = Match.message $ \chan msg -> do
+  when (map toLower msg `contains` "perfect") $ do
+    thinkAboutIt
+    liftIO (randomChoice messages) >>= Command.privmsg chan
+  where
+    messages = [
+        "Perfect you say?  Nothing is perfect!"
+      , "Perfect!!!!!!!!!!!!"
+      , "Perfect again..."
+      ]
 
 -- | Makes Alonzo op everybody who joins a channel.
 opMe :: Trait a

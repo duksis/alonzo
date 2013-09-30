@@ -29,3 +29,30 @@ executable alonzo
     , data-default
     , irc
     , containers
+    , random
+
+test-suite spec
+  default-language:
+      Haskell2010
+  type:
+      exitcode-stdio-1.0
+  ghc-options:
+      -Wall -Werror
+  hs-source-dirs:
+      test, src
+  main-is:
+      Spec.hs
+  build-depends:
+      base == 4.*
+    , mtl
+    , bytestring
+    , text
+    , connection
+    , network
+    , data-default
+    , irc
+    , containers
+    , random
+
+    , hspec
+    , QuickCheck
