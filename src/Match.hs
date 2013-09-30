@@ -12,9 +12,9 @@ invite f m = case m of
   Message {msg_command = "INVITE", msg_params = [_, chan]} -> f chan
   _ -> return ()
 
-message :: Monad m => (Channel -> String -> m ()) -> Message -> m ()
+message :: Monad m => (Channel -> UserName -> String -> m ()) -> Message -> m ()
 message f m = case m of
-  Message {msg_command = "PRIVMSG", msg_params = [chan@('#':_), msg]} -> f chan msg
+  Message {msg_prefix = Just (NickName from _ _), msg_command = "PRIVMSG", msg_params = [chan@('#':_), msg]} -> f chan from msg
   _ -> return ()
 
 nick :: Monad m => (UserName -> UserName -> m ()) -> Message -> m ()

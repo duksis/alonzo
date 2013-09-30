@@ -24,6 +24,7 @@ main = readConfig >>= alonzo nick brain traits
       , memorizeNicks
       , mentionAll
       , opMe
+      , greet
       , socialize
       , complainAboutPerfect
       ]
@@ -34,23 +35,35 @@ thinkAboutIt = liftIO $ randomRIO (200000, 500000) >>= threadDelay
 
 -- | Makes Alonzo mention all nicks in channel if a message contains @all.
 mentionAll :: Trait Brain
-mentionAll = Match.message $ \chan msg -> do
+mentionAll = Match.message $ \chan _ msg -> do
   when (msg `contains` "@all") $ do
     nicks <- recallNicks chan
     Command.privmsg chan ("^ " ++ unwords nicks)
 
 -- | Makes Alonzo complain on "perfect".
 complainAboutPerfect :: Trait Brain
-complainAboutPerfect = Match.message $ \chan msg -> do
+complainAboutPerfect = Match.message $ \chan _ msg -> do
   when (map toLower msg `contains` "perfect") $ do
     thinkAboutIt
-    liftIO (randomChoice messages) >>= Command.privmsg chan
+    randomChoice messages >>= Command.privmsg chan
   where
     messages = [
         "Perfect you say?  Nothing is perfect!"
       , "Perfect!!!!!!!!!!!!"
       , "Perfect again..."
       ]
+
+-- | Makes Alonzo greet you.
+greet :: Trait Brain
+greet = Match.message $ \chan you msg -> do
+  me <- recallMyNick
+  when (msg `startsWith` (me ++ ": ") && containsGreetin msg) $ do
+    thinkAboutIt
+    greeting <- randomChoice greetings
+    Command.privmsg chan (capitalize greeting ++ " " ++ you ++ ", nice to meet you!  I'm " ++ me ++ ", your friendly IRC bot!")
+  where
+    greetings = ["greetings" , "hello" , "hey" , "hi" , "howdy" , "welcome"]
+    containsGreetin msg = (map toLower msg `contains`) `any` greetings
 
 -- | Makes Alonzo op everybody who joins a channel.
 opMe :: Trait a
