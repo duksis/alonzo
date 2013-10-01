@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Main (main) where
 
 import           Data.List
@@ -27,6 +26,7 @@ main = readConfig >>= alonzo nick brain traits
       , mentionAll
       , opMe
       , greet
+      , parrot
       , pretendToBe
       , socialize
       , complainAboutPerfect
@@ -73,10 +73,20 @@ pretendToBe :: Trait Brain
 pretendToBe = Match.message $ \_ _ msg -> do
   me <- recallMyNick
   when (msg `contains` me) $ do
-    case msg =~ (" [Pp]retend to be ([A-Za-z0-9]*)" :: String) of
+    case msg =~ "[Pp]retend to be ([A-Za-z0-9]*)" of
       [[_, name]] -> do
         thinkAboutIt
         Command.nick name
+      _ -> return ()
+
+parrot :: Trait Brain
+parrot = Match.message $ \chan _ msg -> do
+  me <- recallMyNick
+  when (msg `contains` me && msg =~ "(\\bsays?\\b|\\bthinks?\\b)") $ do
+    case msg =~ "\"(.*)\"" of
+      [[_, sentence]] -> do
+        thinkAboutIt
+        Command.privmsg chan sentence
       _ -> return ()
 
 -- | Makes Alonzo op everybody who joins a channel.
