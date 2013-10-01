@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main (main) where
 
+import           Data.List
 import           Data.Char
 import           Control.Monad (when)
 import           Control.Concurrent (threadDelay)
@@ -13,7 +14,7 @@ import           Alonzo
 import           Brain
 import qualified Command
 import qualified Match
-import           Text.Regex.Posix
+import           Text.Regex.PCRE
 
 main :: IO ()
 main = readConfig >>= alonzo nick brain traits
@@ -65,7 +66,7 @@ greet = Match.message $ \chan you msg -> do
     Command.privmsg chan (capitalize greeting ++ " " ++ you ++ ", nice to meet you!  I'm " ++ me ++ ", your friendly IRC bot!")
   where
     greetings = ["greetings" , "hello" , "hey" , "hi" , "howdy" , "welcome"]
-    containsGreeting msg = (map toLower msg `contains`) `any` greetings
+    containsGreeting msg = map toLower msg =~ ("\\b(" ++ intercalate "\\b|\\b" greetings ++ "\\b)")
 
 -- | Makes Alonzo pretend to be somebody else.
 pretendToBe :: Trait Brain
