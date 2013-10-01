@@ -15,3 +15,6 @@ op chan name = lift . send $ unwords ["MODE", chan, "+o", name]
 
 privmsg :: Channel -> String -> Alonzo a ()
 privmsg chan = sendMessage . C.privmsg chan
+
+nick :: UserName -> Alonzo a ()
+nick = sendMessage . C.nick

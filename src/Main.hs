@@ -13,6 +13,7 @@ import           Alonzo
 import           Brain
 import qualified Command
 import qualified Match
+import           Text.Regex.Posix
 
 main :: IO ()
 main = readConfig >>= alonzo nick brain traits
@@ -25,6 +26,7 @@ main = readConfig >>= alonzo nick brain traits
       , mentionAll
       , opMe
       , greet
+      , pretendToBe
       , socialize
       , complainAboutPerfect
       ]
@@ -64,6 +66,17 @@ greet = Match.message $ \chan you msg -> do
   where
     greetings = ["greetings" , "hello" , "hey" , "hi" , "howdy" , "welcome"]
     containsGreeting msg = (map toLower msg `contains`) `any` greetings
+
+-- | Makes Alonzo pretend to be somebody else.
+pretendToBe :: Trait Brain
+pretendToBe = Match.message $ \_ _ msg -> do
+  me <- recallMyNick
+  when (msg `contains` me) $ do
+    case msg =~ (" [Pp]retend to be ([A-Za-z0-9]*)" :: String) of
+      [[_, name]] -> do
+        thinkAboutIt
+        Command.nick name
+      _ -> return ()
 
 -- | Makes Alonzo op everybody who joins a channel.
 opMe :: Trait a

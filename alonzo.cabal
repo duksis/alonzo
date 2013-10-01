@@ -30,6 +30,7 @@ executable alonzo
     , irc
     , containers
     , random
+    , regex-posix
 
 test-suite spec
   default-language:
@@ -53,6 +54,7 @@ test-suite spec
     , irc
     , containers
     , random
+    , regex-posix
 
     , hspec
     , QuickCheck
