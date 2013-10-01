@@ -57,13 +57,13 @@ complainAboutPerfect = Match.message $ \chan _ msg -> do
 greet :: Trait Brain
 greet = Match.message $ \chan you msg -> do
   me <- recallMyNick
-  when (msg `contains` me && containsGreetin msg) $ do
+  when (msg `contains` me && containsGreeting msg) $ do
     thinkAboutIt
     greeting <- randomChoice greetings
     Command.privmsg chan (capitalize greeting ++ " " ++ you ++ ", nice to meet you!  I'm " ++ me ++ ", your friendly IRC bot!")
   where
     greetings = ["greetings" , "hello" , "hey" , "hi" , "howdy" , "welcome"]
-    containsGreetin msg = (map toLower msg `contains`) `any` greetings
+    containsGreeting msg = (map toLower msg `contains`) `any` greetings
 
 -- | Makes Alonzo op everybody who joins a channel.
 opMe :: Trait a
