@@ -1,3 +1,4 @@
+{-# LANGUAGE QuasiQuotes #-}
 module Bot (run) where
 
 import           Data.List
@@ -6,6 +7,8 @@ import           Control.Monad (when)
 import           Control.Concurrent (threadDelay)
 import           Control.Monad.State (liftIO)
 import           System.Random
+import           Text.Regex.PCRE
+import           Data.String.Interpolate
 
 import           Util
 import           Config
@@ -13,7 +16,9 @@ import           Alonzo
 import           Brain
 import qualified Command
 import qualified Match
-import           Text.Regex.PCRE
+
+containsAny :: String -> [String] -> Bool
+containsAny msg ys = map toLower msg =~ ("\\b(" ++ intercalate "\\b|\\b" ys ++ "\\b)")
 
 run :: IO ()
 run = readConfig >>= alonzo nick brain traits
@@ -60,13 +65,12 @@ complainAboutPerfect = Match.message $ \chan _ msg -> do
 greet :: Trait Brain
 greet = Match.message $ \chan you msg -> do
   me <- recallMyNick
-  when (msg `contains` me && containsGreeting msg) $ do
+  when (msg `contains` me && msg `containsAny` greetings) $ do
     thinkAboutIt
     greeting <- randomChoice greetings
-    Command.privmsg chan (capitalize greeting ++ " " ++ you ++ ", nice to meet you!  I'm " ++ me ++ ", your friendly IRC bot!")
+    Command.privmsg chan [i|#{capitalize greeting} #{you}, nice to meet you!  I'm #{me}, your friendly IRC bot!|]
   where
     greetings = ["greetings" , "hello" , "hey" , "hi" , "howdy" , "welcome"]
-    containsGreeting msg = map toLower msg =~ ("\\b(" ++ intercalate "\\b|\\b" greetings ++ "\\b)")
 
 -- | Makes Alonzo pretend to be somebody else.
 pretendToBe :: Trait Brain
@@ -82,7 +86,7 @@ pretendToBe = Match.message $ \_ _ msg -> do
 parrot :: Trait Brain
 parrot = Match.message $ \chan _ msg -> do
   me <- recallMyNick
-  when (msg `contains` me && msg =~ "(\\bsays?\\b|\\bthinks?\\b)") $ do
+  when (msg `contains` me && msg `containsAny` ["says?", "thinks?", "tells?"]) $ do
     case msg =~ "\"(.*)\"" of
       [[_, sentence]] -> do
         thinkAboutIt
