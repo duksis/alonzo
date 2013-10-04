@@ -21,10 +21,11 @@ containsAny :: String -> [String] -> Bool
 containsAny msg ys = map toLower msg =~ ("\\b(" ++ intercalate "\\b|\\b" ys ++ "\\b)")
 
 run :: IO ()
-run = readConfig >>= alonzo nick brain traits
+run = do
+  (nick, config) <- readConfig
+  let brain = emptyBrain nick
+  alonzo nick brain traits config
   where
-    nick = "alonzo"
-    brain = emptyBrain nick
     traits = [
         memorizeMyNick
       , memorizeNicks

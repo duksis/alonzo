@@ -1,5 +1,6 @@
 module Config (readConfig) where
 
+import           Network.IRC (UserName)
 import           Control.Applicative
 import           Data.Maybe
 import           Data.Char
@@ -9,6 +10,9 @@ import           Network.Socket (HostName, PortNumber)
 import           Data.Default
 
 import           IRC
+
+readNick :: IO (Maybe UserName)
+readNick = lookupEnv "ALONZO_NICK"
 
 readHost :: IO (Maybe HostName)
 readHost = lookupEnv "ALONZO_HOST"
@@ -28,18 +32,19 @@ readVerify = fmap isTrue <$> lookupEnv "ALONZO_VERIFY_SSL"
 isTrue :: String -> Bool
 isTrue = (== "true") . map toLower
 
-readConfig :: IO Config
+readConfig :: IO (UserName, Config)
 readConfig = do
+  mNick <- readNick
   mHost <- readHost
   mPort <- readPort
   mPassword <- readPassword
   mSsl <- readSsl
   mVerify <- readVerify
   let c = def
-  return c {
+  return (fromMaybe "alonzo" mNick, c {
       host = fromMaybe (host c) mHost
     , port = fromMaybe (port c) mPort
     , password = mPassword
     , ssl = fromMaybe (ssl c) mSsl
     , verify = fromMaybe (verify c) mVerify
-    }
+    })
