@@ -36,6 +36,7 @@ run = do
       , pretendToBe
       , socialize
       , complainAboutPerfect
+      , complainAboutCurses
       ]
 
 -- | Take a break for 200 to 500 milliseconds and think about it.
@@ -61,6 +62,20 @@ complainAboutPerfect = Match.message $ \chan _ msg -> do
       , "Perfect!!!!!!!!!!!!"
       , "Perfect again..."
       ]
+
+-- | Makes Alonzo complain on curses
+complainAboutCurses :: Trait Brain
+complainAboutCurses = Match.message $ \chan _ msg -> do
+  when (msg `containsAny` curses ) $ do
+    thinkAboutIt
+    randomChoice messages >>= Command.privmsg chan
+  where
+    messages = [
+        "Please! We have bots in this room!"
+      , "Watch your language!"
+      , "There he goes again.... :sadpanda:"
+      ]
+    curses = ["fuck(ing)?", "damn", "f\\*\\*k", "fricking", "bloody", "sadpanda"]
 
 -- | Makes Alonzo greet you.
 greet :: Trait Brain
