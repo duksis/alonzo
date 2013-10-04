@@ -40,7 +40,9 @@ memorizeMyNick = Match.nick $ \old new -> do
     modify $ \b -> b{myNick = new}
 
 recallNicks :: Channel -> Alonzo Brain [UserName]
-recallNicks c = maybe [] Set.elems . Map.lookup c <$> gets nicks
+recallNicks c = do
+  myNick <- recallMyNick
+  filter (/= myNick) . maybe [] Set.elems . Map.lookup c <$> gets nicks
 
 memorizeNicks :: Trait Brain
 memorizeNicks m = case m of
