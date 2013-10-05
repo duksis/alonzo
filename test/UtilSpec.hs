@@ -1,8 +1,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 module UtilSpec (main, spec) where
 
-import           Test.Hspec
-import           Test.QuickCheck
+import           Helper
 import           Control.Monad (replicateM)
 import           Data.List (nub, sort)
 
