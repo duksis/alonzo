@@ -22,7 +22,8 @@ containsAny msg ys = map toLower msg =~ ("\\b(" ++ intercalate "\\b|\\b" ys ++ "
 
 run :: IO ()
 run = do
-  (nick, config) <- readConfig
+  nick <- readNick
+  config <- readConfig
   let brain = emptyBrain nick
   alonzo nick brain traits config
   where
