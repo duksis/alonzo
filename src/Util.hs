@@ -5,9 +5,13 @@ import           Data.Char
 import           Data.List
 import           Control.Monad.State (MonadIO(..), liftM)
 import           System.Random
+import           Text.Regex.PCRE
 
 contains :: String -> String -> Bool
 contains = flip isInfixOf
+
+containsAny :: String -> [String] -> Bool
+containsAny msg ys = map toLower msg =~ ("(\\W|^)(" ++ intercalate "\\b|\\b" ys ++ "(\\W|$))")
 
 startsWith :: String -> String -> Bool
 startsWith = flip isPrefixOf

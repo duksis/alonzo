@@ -12,6 +12,23 @@ main = hspec spec
 
 spec :: Spec
 spec = do
+  describe "contains" $ do
+    it "returnd True if string contains word" $ do
+      contains "who when why" "when" `shouldBe` True
+
+    it "retirns False if string doesn't contain the word" $ do
+      contains "who why" "when" `shouldBe` False
+
+  describe "containsAny" $ do
+    it "returnd True if string contains any of given words" $ do
+      containsAny "who, when, why" ["when", "where"] `shouldBe` True
+
+    it "returns False if string doesn't contain any of given words" $ do
+      containsAny "who, why" ["when"] `shouldBe` False
+
+    it "returnd True if string contains words with nonword characters" $ do
+      containsAny "hey all:" ["@all", "all:"] `shouldBe` True
+
   describe "randomChoice" $ do
     it "returns a random element of a list" $ do
       property $ \(NonEmpty xs :: NonEmptyList Int) -> do

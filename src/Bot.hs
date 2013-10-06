@@ -17,9 +17,6 @@ import           Brain
 import qualified Command
 import qualified Match
 
-containsAny :: String -> [String] -> Bool
-containsAny msg ys = map toLower msg =~ ("\\b(" ++ intercalate "\\b|\\b" ys ++ "\\b)")
-
 run :: IO ()
 run = do
   nick <- readNick
@@ -47,9 +44,11 @@ thinkAboutIt = liftIO $ randomRIO (200000, 500000) >>= threadDelay
 -- | Makes Alonzo mention all nicks in channel if a message contains @all.
 mentionAll :: Trait Brain
 mentionAll = Match.message $ \chan _ msg -> do
-  when (msg `contains` "@all") $ do
+  when (msg `containsAny` allMentions) $ do
     nicks <- recallNicks chan
     Command.privmsg chan ("^ " ++ unwords nicks)
+  where
+    allMentions = ["@all", "all:"]
 
 -- | Makes Alonzo complain on "perfect".
 complainAboutPerfect :: Trait Brain
