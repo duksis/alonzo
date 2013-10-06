@@ -1,7 +1,6 @@
 {-# LANGUAGE QuasiQuotes #-}
 module Bot (run) where
 
-import           Data.List
 import           Data.Char
 import           Control.Monad (when)
 import           Control.Concurrent (threadDelay)
