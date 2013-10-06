@@ -20,7 +20,7 @@ executable alonzo
   main-is:
       Main.hs
   build-depends:
-      base == 4.*
+      base >=  4.6 && < 5
     , mtl
     , bytestring
     , text
@@ -45,7 +45,7 @@ test-suite spec
   main-is:
       Spec.hs
   build-depends:
-      base == 4.*
+      base >=  4.6 && < 5
     , mtl
     , bytestring
     , text

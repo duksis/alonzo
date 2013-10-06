@@ -1,4 +1,7 @@
-# Alonzo
+# Alonzo: Your friendly IRC bot!
 
-    $ cabal configure --enable-tests
+### Running the tests
+
+    $ cabal update && cabal sandbox init
+    $ cabal install --only-dependencies --enable-tests
     $ cabal test
