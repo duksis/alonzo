@@ -20,14 +20,17 @@ spec = do
       contains "who why" "when" `shouldBe` False
 
   describe "containsAny" $ do
-    it "returnd True if string contains any of given words" $ do
+    it "returns True if string contains any of given words" $ do
       containsAny "who, when, why" ["when", "where"] `shouldBe` True
 
     it "returns False if string doesn't contain any of given words" $ do
       containsAny "who, why" ["when"] `shouldBe` False
 
-    it "returnd True if string contains words with nonword characters" $ do
+    it "returns True if string contains words with nonword characters" $ do
       containsAny "hey all:" ["@all", "all:"] `shouldBe` True
+
+    it "returns False if string does not contain the exact words" $ do
+      containsAny "hey @allyou" ["@all", "all:"] `shouldBe` False
 
   describe "randomChoice" $ do
     it "returns a random element of a list" $ do
